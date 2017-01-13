@@ -1,2 +1,8 @@
 *.jpg
 *.mat
+
+*~
+*.el
+*.log
+*.aux
+*.pdf
