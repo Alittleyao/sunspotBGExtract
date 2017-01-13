@@ -1,0 +1,140 @@
+% !Mode:: "TeX:UTF-8:Hard"
+% 小论文
+\documentclass[UTF8,a4paper,twoside]{ctexart}
+
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\geometry{a4paper,centering,scale=0.8}
+\usepackage{subfig}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{mathtools}
+
+\newcommand\diff{\,\mathrm{d}}
+\newcommand\ee{\mathrm{e}}
+
+\title{基于Lab色彩空间的太阳黑子手绘图分割方法}
+\author{舒瑶}
+\date{}
+
+\begin{document}
+\maketitle
+
+\textbf{摘要: }针对太阳黑子手绘图中印刷与手绘部分的分割问题，提出了一种基于Lab色彩空间的像素聚类方法。该方法首先计算手绘图在Lab色彩空间中的$a$、$b$分量，利用这两个分量对像素点进行K-means聚类。结果表明此方法准确的分割了手绘图中的印刷与手绘部分。为提高批量分割的计算速度，对所有的手绘图进行抽样，对样本总体利用上述方法分割后，直接利用样本的分割准则对其他的手绘图进行分割。分析表明，此方法在极大地提高计算速度的同时保证了分割的准确性。
+
+\textbf{关键词: }图像分割；太阳黑子；Lab色彩空间；K-means聚类
+
+\textbf{Abstract: }Sunspots drawings，a traditional way of recording sunspots activities, is meaningful to research the sunspot's long-term movement regularity. What's more, background extraction is an important step to process hand-drawings digitally by computer. In order to solve the problem, a background subtraction method based on Lab color space is proposed. At first, it sections a and b color samples based on k-means clustering under Lab color space. Then analyzing clustering result and extracting background pixels and foreground pixels directly by discrimination function instead of clustering. The segmentation results show that the method can extract the printing part and hand-draw part quickly and accurately.
+
+\textbf{Keywords: }image segmentation；sunspot；CIELAB color space；k-means clustering
+
+\section{引言}
+太阳黑子是太阳上最显著的观测特征，也是最早开始系统记录的太阳活动现象[1]。太阳黑子是磁场聚集后出现在太阳光球表面的临时现象，在可见光下呈现比周围区域黑暗的斑点。黑子活跃时会对地球的磁场产生影响，地球上的旱涝、水灾、地震等也与太阳黑子有一定的联系[2]。在全日面太阳黑子照相观测系统建立之前，投影法是观测黑子活动的传统方法，黑子的大小、形状和位置等特征均是手工描绘。太阳黑子的研究需要的是持续的、长期的、连贯的、可靠的数据。太阳黑子手绘图数字化，不仅有助于黑子观测资料的永久保存，而且可以为科学家研究黑子的长期变化提供更丰富的数据和更便捷的使用服务。
+
+国外太阳黑子手绘图数字化工作开展得较早，HSUNSPOTS和DigiSun就是由西班牙和比利时分别开发的两款黑子手绘图数字化软件。我国对太阳黑子相关活动的观测开始于20世纪30年代末，至今云南天文台记录的如图1所示的太阳黑子手绘图已达20000多张。这些年来，这些黑子观测资料正在进行数字化。数字化的核心是实现对黑子手绘图信息的准确识别，其首要步骤就是对黑子手绘图印刷与手绘部分进行精准分割。
+
+本文中所处理的太阳黑子手绘图是指黑子手绘图的扫描图像，原始的黑子手绘图是由天文工作者将黑子相关信息绘制在特定纸张上得到。特定纸张上有固定的表格和文字信息，如图1所示，其背景色不像通用纸张是纯白色，这导致扫描得到的黑子手绘图噪点较多、背景斑驳，但是印刷部分和手绘部分的色彩较为集中。因此本文提出基于Lab色彩空间，不考虑明度L分量，仅对$a$、$b$色彩分量进行K-means像素聚类。对于大批量手绘图的分割处理，对每个手绘图都进行聚类非常耗时。而不同手绘图中印刷部分和手绘部分的色彩差异较小，为加快分割效率，我们仅抽样一部分手绘图进行聚类，利用样本的分割准则对其它手绘图进行分割。
+
+\begin{figure}
+  \centering
+  \includegraphics[width=7cm]{fig01.png}
+  \caption{太阳黑子手绘图像原图}
+\end{figure}
+
+\section{色彩空间转换}
+\subsection{Lab色彩空间}
+对于太阳黑子手绘图的分割问题，主要考虑的是不同像素点之间的色彩差异。为了准确的对色彩进行度量，需要选择合适的色彩空间。在这里，我们选择了Lab色彩空间而不是使用最广泛的RGB色彩空间。理由如下：RGB色彩空间是通过R、G、B三基色不同程度的迭加来产生不同的色彩，其中三个色彩分量之间相互影响，任意一个分量的变化引起亮度和色彩的同时变化，而且其色彩分布是不均匀的。显然，RGB色彩空间对本问题并不合适。下面对Lab空间给出一个简单的介绍。
+
+1976年，国际照明委员会（International Commission on Illumination）为了近似人类视觉，设计出了由$L^*$、$a^*$、$b^*$三个基本坐标组成的CIE L*a*b*（CIELAB）色彩模型，后文省略*，简写为Lab色彩空间。Lab色彩空间属于色彩-对立空间，基于非线性压缩的CIE XYZ色彩空间，使用MacAdam椭圆所描述的色彩差异度量来建立线性化的色彩差异感知，致力于感知均匀性，即在色彩空间中相同的距离对应色彩上相同的差别，弥补了RGB色彩空间色彩分布不均的问题。Lab色彩空间相比其他色彩空间，更接近人眼对色彩的感觉，坐标的亮度信息和色彩信息分开保存，其中维度$L$表示明度，$a$和$b$表示色彩对立维度，通过修改$a$、$b$色彩分量的输出色阶可以达到精确的色彩平衡。在Lab色彩空间中，每个具有$L$、$a$、$b$三个分量的色彩都可以近似为三维空间中的一个点，任何两个色彩的相对感知差别，可以通过计算他们之间的欧几里得距离得到，通常用$\Delta E_{ab}^*$来表示。假设Lab色彩空间中的两个色彩为$(L_1,a_1,b_1)$和$(L_2,a_2,b_2)$：
+\begin{equation}
+  \Delta E_{ab}^* = \sqrt{(L_2 - L_1)^2 + (a_2 - a_1)^2 + (b_2 - b_1)^2}.
+\end{equation}
+
+
+\subsection{RGB转换为Lab色彩空间}
+实现RGB色彩空间到Lab色彩空间的转换需要先将RGB色彩空间转换为XYZ色彩空间，假设r，g，b为三个像素通道，取值范围均为$[0,255]$,转换公式如下所示：
+\begin{equation}
+  \left\{
+    \begin{gathered}
+      R_{srgb} = g(\frac{r}{255.0}) \\
+      G_{srgb} = g(\frac{g}{255.0}) \\
+      B_{srgb} = g(\frac{b}{255.0})
+    \end{gathered}
+  \right.
+\end{equation}
+其中$R_{srgb},G_{srgb},B_{srgb} \in [0,1]$.
+\begin{equation}
+  \begin{pmatrix}
+    X \\ Y \\ Z
+  \end{pmatrix} =
+  \begin{pmatrix}
+    0.4124 & 0.3576 & 0.1805 \\
+    0.2126 & 0.7152 & 0.0722 \\
+    0.0193 & 0.1192 & 0.9505
+  \end{pmatrix}
+  \begin{pmatrix}
+    g(R_{srgb}) \\
+    g(G_{srgb}) \\
+    g(B_{srgb})
+  \end{pmatrix}
+\end{equation}
+其中
+\begin{equation}
+  g(k) =
+  \begin{dcases}
+    \frac{k}{12.92}, & k \leq 0.04045 \\
+    {\left(\frac{k+0.055}{1.055}\right)}^{2.4}, & k > 0.04
+  \end{dcases}
+\end{equation}
+式中$g(k)$函数用来对图像进行非线性色调的编辑，目的是提高图像对比度，函数不唯一。
+
+然后，将XYZ色彩空间转换为Lab色彩空间，转换公式如下所示：
+\begin{equation}
+  \left\{
+    \begin{lgathered}
+      L = 116 f(Y/Y_n) - 16 \\
+      a = 500[f(X/X_n) - f(Y/X_n)] \\
+      b = 200[f(Y/Y_n) - f(Z/Z_n)]
+    \end{lgathered}
+  \right.
+\end{equation}
+式中$L$、$a$、$b$是最终的Lab色彩空间三个通道的值；X、Y、Z是RGB色彩空间转换为XYZ色彩空间后计算出来的值。Xn、Yn、Zn一般默认是95.047、100.0、108.883。
+
+\section{Lab色彩空间中的K-means聚类算法}
+\subsection{K-means算法的基本思想}
+聚类的基本思想是通过数据自身的特点，将给定的数据集合自动的划分为若干个由相似的数据点组成的子集。聚类的方法很多，可以分为划分法、层次法、基于密度的方法、基于网格的方法、基于模型的方法等。K-means算法[3][4]是一种无监督学习的划分法，是很典型的基于距离的聚类算法，即认为两个对象的距离越近，其相似度就越大。该算法思想简便，用于图像分割具有快速、直观、易于实现的优点，容易实现对大规模数据的聚类。
+
+假设提取到的原始数据的集合为$D = \{x_1, x_2, \ldots, x_n\}$，并且每个$x_j$为$d$维的向量，在给定分类组数$k(k\leq n)$的条件下，将原始数据分成个$k$样本空间$\{s_i\}^k_{i=1}$，$\{\mu_i\}^k_{i=1}$表示我们对属于同一类的样本中心点的猜测。经典的K-means算法将样例$x_j(x_j \in R^n)$到$\mu_i$的距离作为优化的目标函数$f_{\text{k-means}}(s)$，即把每个样例与每个样本空间中心点之间的误差平方和最小作为相似度测度来建立映射关系，根据映射关系将所有的数据点归类于不同的质心$\mu_i$，从而得到最终的聚类结果。在数值模型上，即为对以下表达式求最小值：
+\begin{equation}
+  f_{\text{k-means}}(s) = 
+\end{equation}
+\subsection{Lab色彩空间中a、b分量的K-means聚类}
+传统的太阳黑子手绘观测记录是纸介质的，在保存过程中受到外界温度、湿度等条件影响，纸张本身会受潮产生斑点及变形，会降低数字扫描图像质量，导致黑子图像噪点较多、背景斑驳等。在RGB色彩空间直接进行K-means聚类效果不理想。但是黑子手绘图像中印刷部分和手绘部分采用不同色彩记录，为只针对色彩的聚类提供了可能性。这里我们抛开明度L的影响，对a、b色彩分量，进行K-means聚类。
+每个具有a、b两个分量的色彩都可以近似为二维空间中的一个点，任何两个色彩的相对感知差别可以用他们的Euclidean distance（欧几里得距离）表示。对a、b色彩分量进行K-means聚类，可以看作在以a、b色彩分量值为坐标轴的二维空间中，对所有色彩点之间距离的聚类。那么，对目标函数的求解问题，可以利用函数求极值的方法得到迭代运算的调整规则，并对目标函数进行优化，具体过程如下：
+
+\subsection{寻找判别函数}
+对于我们研究的问题，我们只需要将所有色彩点分为印刷部分和非印刷部分这两类，利用2.2中所介绍的K-means聚类方法，我们可以得到这两类的质心，根据7式所给出的判断准则，对于色彩空间中的任意一点，把它归到最近的质心的类。对于两类的情况，我们可以找到一条分界线，位于分界线两侧的色彩点与同侧的质心属于同一类。显然，位于分界线上的色彩点与两个质心的距离相等，这条分界线就是这两个质心的连线的中垂线。对于质心 ， ，其中垂线方程为 
+
+\section{实验与结论}
+\subsection{基于判断准则的背景提取}
+对所有的太阳黑子手绘图进行随机抽样，转换到Lab空间后，对样本总体的a，b分量进行K-means聚类，聚类结果图如图3所示。最后直接利用聚类得到的分割准则对其他的手绘图进行分割。图4、5分别为印刷与手绘部分整幅图像分割结果。
+
+\subsection{Lab色彩空间和RGB色彩空间聚类划分对比分析}
+
+\subsection{聚类和判断准则划分对比分析}
+
+\section{结语}
+
+本文提出了一种基于Lab色彩空间的太阳黑子手绘图分割方法，该方法不考虑明度对图像分割的影响，仅通过a、b色彩对印刷部分和手绘部分进行分割，达到了较理想的效果。通过K均值聚类将印刷部分分离出来，设置印刷部分为白色，显示的图像即为手绘部分。最后根据K均值聚类寻找判断准则来替代该聚类，达到同样效果的前提下，很大程度上节省了批量处理的时间。实验表明，该方法能准确的分离太阳黑子手绘图的印刷部分和手绘部分。本文提出的算法也有不足之处，比如由RGB色彩空间转换到Lab空间较耗时。
+
+
+%\bibliographystyle{unsrt}
+
+%\bibliography{ref}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
