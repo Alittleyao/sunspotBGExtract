@@ -107,7 +107,7 @@
 
 假设提取到的原始数据的集合为$D = \{\vb*{x}_1, \vb*{x}_2, \ldots, \vb*{x}_n\}$，并且每个$\vb*{x}_j$为$d$维的向量，在给定分类组数$k(k\leq n)$的条件下，将原始数据划分成个$k$个子集$\vb*{S} = \{S_1, S_2, \ldots, S_k\}$，$\vb*{\mu}_i$为样本$S_i$的中心点。K-means聚类的目的就是找到一个划分$\vb*{S}$，使其类内平方和最小，即每个点到其所属类的中心点的距离的平方和最小。用数学表达式表达，即求解下述最优化问题：
 \begin{equation}
-  \argmin_{\vb*{S}} = \sum_{i = 1}^k \sum_{\vb*{x} \in S_i} \norm{\vb*{x} - \vb*{\mu}_i}^2.
+  \argmin_{\vb*{S}} \sum_{i = 1}^k \sum_{\vb*{x} \in S_i} \norm{\vb*{x} - \vb*{\mu}_i}^2.
 \end{equation}
 
 
