@@ -134,7 +134,7 @@
   \hat{y} = \argmin_{l\in \vb{Y}} \norm{\vb*{\mu}_l - \vb*{x}}.
 \end{equation}
 
-对于大量需要分类的数据，可以结合K-means聚类和最近质心分类法，以便于减少计算时间。首先，选取部分数据进行K-means聚类，将这部分已分类的数据作为样本数据。然后利用最近质心分类器对剩下的数据进行分类。对于本文所讨论大批量太阳黑子手绘图的背景提取问题，即采用此方法处理，具体过程见下节。
+对于大量需要分类的数据，可以结合K-means聚类和最近质心分类法，以便于减少计算时间。首先，选取部分数据进行K-means聚类，将这部分已分类的数据作为样本数据。然后利用最近质心分类器对剩下的数据进行分类。对于本文所讨论大批量太阳黑子手绘图的背景提取问题，即采用此方法处理，具体结果见下节。
 
 % \subsection{Lab色彩空间中a、b分量的K-means聚类}
 % 传统的太阳黑子手绘观测记录是纸介质的，在保存过程中受到外界温度、湿度等条件影响，纸张本身会受潮产生斑点及变形，会降低数字扫描图像质量，导致黑子图像噪点较多、背景斑驳等。在RGB色彩空间直接进行K-means聚类效果不理想。但是黑子手绘图像中印刷部分和手绘部分采用不同色彩记录，为只针对色彩的聚类提供了可能性。这里我们抛开明度L的影响，对a、b色彩分量，进行K-means聚类。
@@ -153,7 +153,7 @@
   \caption{太阳黑子手绘图像素的$a$，$b$分量对数分布图}\label{abDistribute}
 \end{figure}
 
-在所有的太阳黑子手绘图中进行随机抽样，对所有样本的像素的$a$，$b$分量按照第2节中的方法进行两类K-means聚类，即令$k = 2$。聚类的结果见图\ref{clusterResult}--\ref{directCluster_c}。其中，图\ref{clusterResult} 为$a,b$平面的聚类结果图；图\ref{directCluster_a} 为局部原始图像；图\ref{directCluster_b} 为聚类后分离出来的背景图，其对应图\ref{clusterResult} 中左上部分的那一类；图\ref{directCluster_c} 为聚类后分离的手绘图，其对应图\ref{clusterResult} 中右下部分的那一类。
+在所有的太阳黑子手绘图中进行随机抽样，对所有样本的像素的$a$，$b$分量按照第2节中的方法进行两类K-means聚类，即令$k = 2$。聚类的结果见图\ref{clusterResult}--\ref{directCluster_c}。其中，图\ref{clusterResult} 为$a,b$平面的聚类结果图；图\ref{directCluster_a} 为局部原始图像；图\ref{directCluster_b} 为聚类后分离出来的背景图，其对应图\ref{clusterResult} 中左上部分的那一类；图\ref{directCluster_c} 为聚类后分离的手绘图，其对应图\ref{clusterResult} 中右下部分的那一类。从图中的结果表明，此方法能够很好的对背景进行识别与提取。
 
 \begin{figure}[H]
   \centering
@@ -185,6 +185,33 @@
     \label{directCluster_c}
   \end{minipage}
 \end{figure}
+
+对于大批量手绘图的背景提取，为加快计算速度，我们采用第4节中介绍的方法，即结合K-means聚类与最近质心分类器对剩余的手绘图进行背景提取。图\ref{compare_1}--\ref{compare_3}为直接聚类和最近质心分类器的背景提取效果对比图。从图中可以发现，才用最近质心分类器的背景提取效果与直接聚类的效果相差无几。
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}{5cm}
+    \centering
+    \includegraphics[width=5cm]{compare_1.png}
+    \caption{局部原始图像}
+    \label{compare_1}
+  \end{minipage}
+  \hspace{0.2cm}%
+  \begin{minipage}{5cm}
+    \centering
+    \includegraphics[width=5cm]{compare_2.png}
+    \caption{直接聚类提取的背景}
+    \label{compare_2}
+  \end{minipage}
+  \hspace{0.2cm}%
+  \begin{minipage}{5cm}
+    \centering
+    \includegraphics[width=5cm]{compare_3.png}
+    \caption{最近质心分类器提取的背景}
+    \label{compare_3}
+  \end{minipage}
+\end{figure}
+
 
 % \subsection{基于判断准则的背景提取}
 % 对所有的太阳黑子手绘图进行随机抽样，转换到Lab空间后，对样本总体的a，b分量进行K-means聚类，聚类结果图如图3所示。最后直接利用聚类得到的分割准则对其他的手绘图进行分割。图4、5分别为印刷与手绘部分整幅图像分割结果。
