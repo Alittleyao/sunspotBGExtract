@@ -24,13 +24,13 @@
 \begin{document}
 \maketitle
 
-\textbf{摘要: }太阳黑子手绘图是记录太阳黑子活动的传统方式，手绘图的数字化有利于数据的长期保存和研究，而背景提取是数字化过程中的一个关键问题。针对该问题，本文提出了一种基于Lab色彩空间的快速背景提取方法。该方法在Lab色彩空间中，对手绘图的$a$、$b$色彩分量进行两类K-means聚类。聚类结果表明，背景与手绘部分准确的分割为两类。对于大批量手绘图背景提取的情况，为加快提取速度，仅抽取部分手绘图进行聚类，再利用样本的聚类结果直接对其他手绘图进行背景提取。实验结果表明，此方法在保证提取准确性的前提下，极大地加快了提取速度。
+\textbf{摘要: }太阳黑子手绘图是记录太阳黑子活动的传统方式，手绘图的数字化有利于数据的长期保存和研究，而背景提取是数字化过程中的一个关键问题。针对该问题，本文提出了一种基于Lab色彩空间的快速背景提取方法。该方法在Lab色彩空间中，对手绘图的$a$、$b$色彩分量进行两类K-means聚类。聚类结果表明，背景与手绘部分准确的分割为两类。对于大批量手绘图背景提取的情况，为加快提取速度，仅抽取部分手绘图进行聚类，再利用样本的聚类结果用最近质心分类器对其他手绘图进行背景提取。实验结果表明，此方法在保证提取准确性的前提下，极大地加快了提取速度。
 
-\textbf{关键词: }背景提取；太阳黑子；Lab色彩空间；K-means聚类
+\textbf{关键词: }背景提取；太阳黑子；Lab色彩空间；K-means聚类；最近质心分类器
 
-\textbf{Abstract: }Sunspots drawings is a traditional way of recording sunspots activities. Digitization of the drawings is beneficial to long-term storage and research of the data. Background extraction is an important step in the process of digitization. For this problem, we develope a rapid background extraction method based on Lab color space. In this method, we perform two-class K-means cluster for the $a$, $b$ component of Lab color space on the drawings. The cluster results show that the background and the handdrawing part are clustered into two class accurately. For mass drawings background extraction, we only select a part of drawings to perform the aformentioned cluster, then apply their result on other drawings directly. The experimental results show that this method not only enormously speed up the time of processing, but also guaranteed the accuracy.
+\textbf{Abstract: }Sunspots drawings is a traditional way of recording sunspots activities. Digitization of the drawings is beneficial to long-term storage and research of the data. Background extraction is an important step in the process of digitization. For this problem, we develope a rapid background extraction method based on Lab color space. In this method, we perform two-class K-means cluster for the $a$, $b$ component of Lab color space on the drawings. The cluster results show that the background and the handdrawing part are clustered into two class accurately. For mass drawings background extraction, we only select a part of drawings to perform the aformentioned cluster, then apply nearest centroid classifier on other drawings directly. The experimental results show that this method not only enormously speed up the time of processing, but also guaranteed the accuracy.
 
-\textbf{Keywords: }background extraction；sunspot；CIELAB color space；k-means clustering
+\textbf{Keywords: }background extraction；sunspot；CIELAB color space；k-means clustering；nearest centroid classifier
 
 \section{引言}
 太阳黑子是太阳上最显著的观测特征，也是最早开始系统记录的太阳活动现象\cite{李冉阳2016}。太阳黑子是磁场聚集后出现在太阳光球表面的临时现象，在可见光下呈现比周围区域黑暗的斑点。黑子活跃时会对地球的磁场产生影响，地球上的旱涝、水灾、地震等也与太阳黑子有一定的联系\cite{刘学富1999太阳黑子的观测}。在全日面太阳黑子照相观测系统建立之前，投影法是观测黑子活动的传统方法，黑子的大小、形状和位置等特征均是手工描绘。太阳黑子的研究需要的是持续的、长期的、连贯的、可靠的数据。太阳黑子手绘图数字化，不仅有助于黑子观测资料的永久保存，而且可以为科学家研究黑子的长期变化提供更丰富的数据和更便捷的使用服务。
