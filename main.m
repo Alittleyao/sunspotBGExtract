@@ -1,10 +1,6 @@
 tic
-picName = strcat('../Image/1992/1/',ls('../Image/1992/1/*.jpg'));
-
-% for i = 1:29
-i = 13;
 % 读取原始图片
-I = imread(picName(i,:));
+I = imread('ynao_sd_19640609_0015_li.jpg');
 figure;imshow(I)
 % 将RGB转化为Lab
 cform = makecform('srgb2lab');

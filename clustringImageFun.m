@@ -1,4 +1,4 @@
-function  [targetData,tempData] = clustringImageFun( ab,cluster_idx,cluster_center )
+function  [targetData,tempData] = clustringImageFun( ab,cluster_idx,~ )
 %clustringImageFun 寻找判断是否属于印刷部分的判断标准
 %   此处显示详细说明
 
@@ -20,7 +20,7 @@ tempData = unique(tempData,'rows');
 plot(tempData(:,1),tempData(:,2),'*')
 
 % 标记聚类中心点
-plot(cluster_center(:,1),cluster_center(:,2),'ko')
+% plot(cluster_center(:,1),cluster_center(:,2),'ko')
 
 % 设置画图参数
 xlim([80,200])
